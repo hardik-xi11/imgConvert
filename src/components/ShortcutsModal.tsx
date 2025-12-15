@@ -9,8 +9,8 @@ export function ShortcutsModal({ isOpen, onClose }: ShortcutsModalProps) {
     if (!isOpen) return null
 
     const shortcuts = [
-        { keys: ['Ctrl', 'Shift', 'C'], description: 'Convert Images' },
-        { keys: ['Ctrl', 'D'], description: 'Download All' },
+        { keys: ['Shift', 'C'], description: 'Convert Images' },
+        { keys: ['Shift', 'D'], description: 'Download All' },
         { keys: ['Shift', 'J'], description: 'Select JPG Format' },
         { keys: ['Shift', 'P'], description: 'Select PNG Format' },
         { keys: ['Shift', 'W'], description: 'Select WebP Format' },

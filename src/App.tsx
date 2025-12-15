@@ -51,9 +51,9 @@ function App() {
             </div>
             <div>
               <h1 className="text-2xl font-bold text-white tracking-widest uppercase flex items-center gap-2">
-                ImgConvert <span className="text-[10px] px-1.5 py-0.5 bg-orange-500/10 text-orange-500 border border-orange-500/20 rounded-sm tracking-widest font-mono">BETA</span>
+                Img-Convrt <span className="text-[10px] px-1.5 py-0.5 bg-orange-500/10 text-orange-500 border border-orange-500/20 rounded-sm tracking-widest font-mono">BETA</span>
               </h1>
-              <p className="text-xs text-neutral-500 font-mono tracking-widest uppercase">Secure Local Processing</p>
+              <p className="text-xs text-neutral-300 font-mono tracking-widest uppercase">Secure Fast Conversions</p>
             </div>
           </div>
 

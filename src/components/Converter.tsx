@@ -11,7 +11,7 @@ interface ConverterProps {
 }
 
 type FileStatus = 'idle' | 'converting' | 'done' | 'error'
-type TargetFormat = 'png' | 'jpeg' | 'webp' | 'avif'
+type TargetFormat = 'png' | 'jpeg' | 'webp'
 
 interface FileState {
     file: File
@@ -28,6 +28,9 @@ export function Converter({ files, ffmpeg, onClear }: ConverterProps) {
     const [isConverting, setIsConverting] = useState(false)
 
     const convertFile = async (fileState: FileState, index: number) => {
+        const inputName = `input_${index}_${fileState.file.name.replace(/\s/g, '_')}`
+        const outputName = `output_${index}.${targetFormat}`
+
         try {
             // Update status to converting
             setFileStates(prev => {
@@ -37,14 +40,10 @@ export function Converter({ files, ffmpeg, onClear }: ConverterProps) {
             })
 
             const { file } = fileState
-            const inputName = `input_${index}_${file.name.replace(/\s/g, '_')}`
-            const outputName = `output_${index}.${targetFormat}`
 
             await ffmpeg.writeFile(inputName, await fetchFile(file))
 
             const cmd = ['-i', inputName]
-            // Add format specific flags if needed
-            // cmd.push('-c:v', ...)
             cmd.push(outputName)
 
             await ffmpeg.exec(cmd)
@@ -59,8 +58,7 @@ export function Converter({ files, ffmpeg, onClear }: ConverterProps) {
                 return next
             })
 
-            // Cleanup
-            await ffmpeg.deleteFile(inputName)
+            // Clean up output file after reading
             await ffmpeg.deleteFile(outputName)
 
         } catch (err) {
@@ -70,6 +68,13 @@ export function Converter({ files, ffmpeg, onClear }: ConverterProps) {
                 next[index] = { ...next[index], status: 'error', error: 'Conversion failed' }
                 return next
             })
+        } finally {
+            // Always clean up input file
+            try {
+                await ffmpeg.deleteFile(inputName)
+            } catch (e) {
+                // Ignore cleanup errors for input file (it might not have been written)
+            }
         }
     }
 
@@ -115,18 +120,9 @@ export function Converter({ files, ffmpeg, onClear }: ConverterProps) {
                     case 'j': setTargetFormat('jpeg'); break
                     case 'p': setTargetFormat('png'); break
                     case 'w': setTargetFormat('webp'); break
-                    case 'a': setTargetFormat('avif'); break
+                    case 'c': handleConvertAll(); break
+                    case 'd': downloadAll(); break
                 }
-            }
-
-            if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'c') {
-                e.preventDefault()
-                handleConvertAll()
-            }
-
-            if (e.ctrlKey && e.key.toLowerCase() === 'd') {
-                e.preventDefault()
-                downloadAll()
             }
         }
 
@@ -159,7 +155,6 @@ export function Converter({ files, ffmpeg, onClear }: ConverterProps) {
                                 <option value="png">PNG</option>
                                 <option value="jpeg">JPG</option>
                                 <option value="webp">WEBP</option>
-                                <option value="avif">AVIF</option>
                             </select>
                             <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none">
                                 <ArrowRight className="w-3 h-3 text-neutral-600 rotate-90" />
