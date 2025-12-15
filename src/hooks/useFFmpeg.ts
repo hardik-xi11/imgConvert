@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { FFmpeg } from '@ffmpeg/ffmpeg'
 import { toBlobURL } from '@ffmpeg/util'
 
@@ -8,7 +8,7 @@ export function useFFmpeg() {
     const [error, setError] = useState<string | null>(null)
     const ffmpegRef = useRef(new FFmpeg())
 
-    const load = async () => {
+    const load = useCallback(async () => {
         if (loaded) return
         setIsLoading(true)
         setError(null)
@@ -30,11 +30,11 @@ export function useFFmpeg() {
         } finally {
             setIsLoading(false)
         }
-    }
+    }, [loaded])
 
     useEffect(() => {
         load()
-    }, [])
+    }, [load])
 
     return { ffmpeg: ffmpegRef.current, loaded, isLoading, error, load }
 }

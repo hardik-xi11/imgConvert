@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { FFmpeg } from '@ffmpeg/ffmpeg'
 import { fetchFile } from '@ffmpeg/util'
 import { FileDown, X, Loader2, CheckCircle, AlertCircle, ArrowRight } from 'lucide-react'
@@ -27,7 +27,7 @@ export function Converter({ files, ffmpeg, onClear }: ConverterProps) {
     )
     const [isConverting, setIsConverting] = useState(false)
 
-    const convertFile = async (fileState: FileState, index: number) => {
+    const convertFile = useCallback(async (fileState: FileState, index: number) => {
         const inputName = `input_${index}_${fileState.file.name.replace(/\s/g, '_')}`
         const outputName = `output_${index}.${targetFormat}`
 
@@ -49,6 +49,7 @@ export function Converter({ files, ffmpeg, onClear }: ConverterProps) {
             await ffmpeg.exec(cmd)
 
             const data = await ffmpeg.readFile(outputName)
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const blob = new Blob([data as any], { type: `image/${targetFormat}` })
             const url = URL.createObjectURL(blob)
 
@@ -72,13 +73,13 @@ export function Converter({ files, ffmpeg, onClear }: ConverterProps) {
             // Always clean up input file
             try {
                 await ffmpeg.deleteFile(inputName)
-            } catch (e) {
+            } catch {
                 // Ignore cleanup errors for input file (it might not have been written)
             }
         }
-    }
+    }, [ffmpeg, targetFormat])
 
-    const handleConvertAll = async () => {
+    const handleConvertAll = useCallback(async () => {
         setIsConverting(true)
         for (let i = 0; i < fileStates.length; i++) {
             if (fileStates[i].status !== 'done') {
@@ -86,9 +87,9 @@ export function Converter({ files, ffmpeg, onClear }: ConverterProps) {
             }
         }
         setIsConverting(false)
-    }
+    }, [fileStates, isConverting, convertFile])
 
-    const downloadAll = () => {
+    const downloadAll = useCallback(() => {
         fileStates.forEach(s => {
             if (s.outputUrl && s.status === 'done') {
                 const link = document.createElement('a')
@@ -99,7 +100,7 @@ export function Converter({ files, ffmpeg, onClear }: ConverterProps) {
                 document.body.removeChild(link)
             }
         })
-    }
+    }, [fileStates, targetFormat])
 
     // Helper to format bytes
     const formatSize = (bytes: number) => {
@@ -128,7 +129,7 @@ export function Converter({ files, ffmpeg, onClear }: ConverterProps) {
 
         window.addEventListener('keydown', handleKeyDown)
         return () => window.removeEventListener('keydown', handleKeyDown)
-    }, [targetFormat, fileStates, isConverting])
+    }, [handleConvertAll, downloadAll])
 
     return (
         <div className="w-full max-w-4xl mx-auto space-y-6">

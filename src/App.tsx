@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react'
-import { Github, Terminal, Layers, AlertTriangle, RefreshCw, HelpCircle } from 'lucide-react'
+import { Terminal, Layers, AlertTriangle, RefreshCw, HelpCircle } from 'lucide-react'
 import { useFFmpeg } from './hooks/useFFmpeg'
 import { Dropzone } from './components/Dropzone'
 import { Converter } from './components/Converter'
 import { ShortcutsModal } from './components/ShortcutsModal'
 
 function App() {
-  const { loaded, isLoading, error, load, ffmpeg } = useFFmpeg()
+  const { loaded, error, load, ffmpeg } = useFFmpeg()
   const [files, setFiles] = useState<File[]>([])
   const [showShortcuts, setShowShortcuts] = useState(false)
 
@@ -69,9 +69,9 @@ function App() {
               href="https://github.com"
               target="_blank"
               rel="noreferrer"
-              className="px-4 py-2 bg-neutral-900 border border-neutral-800 rounded-sm text-neutral-400 hover:text-white hover:border-neutral-600 transition-all flex items-center gap-2 font-medium text-sm tracking-wide uppercase"
+              className="px-4 py-2 bg-neutral-900 border border-neutral-800 rounded-sm text-neutral-400 hover:text-orange-500 hover:border-orange-500/50 transition-all flex items-center gap-2 font-medium text-sm tracking-wide uppercase"
             >
-              <Github className="w-4 h-4" />
+              <img src="/github.svg" alt="GitHub" className="w-6 h-6" />
               <span>GitHub</span>
             </a>
           </div>

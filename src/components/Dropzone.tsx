@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, ClipboardEvent } from 'react'
+import { useState, useRef, useEffect, useCallback, type ClipboardEvent } from 'react'
 import { UploadCloud, Link as LinkIcon, X, Loader2, ArrowRight } from 'lucide-react'
 import { clsx } from 'clsx'
 
@@ -35,19 +35,19 @@ export function Dropzone({ onFilesSelected, disabled }: DropzoneProps) {
         }
     }
 
-    const handlePaste = (e: ClipboardEvent | Event) => {
+    const handlePaste = useCallback((e: ClipboardEvent | Event) => {
         if (disabled) return
         const clipboardEvent = e as ClipboardEvent
         if (clipboardEvent.clipboardData && clipboardEvent.clipboardData.files.length > 0) {
             onFilesSelected(Array.from(clipboardEvent.clipboardData.files))
         }
-    }
+    }, [disabled, onFilesSelected])
 
     // Global paste listener
     useEffect(() => {
         window.addEventListener('paste', handlePaste)
         return () => window.removeEventListener('paste', handlePaste)
-    }, [disabled, onFilesSelected])
+    }, [handlePaste])
 
     const handleUrlSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
